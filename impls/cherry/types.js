@@ -22,6 +22,10 @@ class MalList extends MalValue {
   pr_str() {
     return '(' + this.value.map(x => x.pr_str()).join(' ') + ')';
   }
+
+  isEmpty() {
+    return this.value.length === 0;
+  }
 }
 
 class MalVector extends MalValue {
