@@ -57,6 +57,11 @@ const bindDef = (ast, env) => {
 
 const doBlock = (ast, env) => {
   const lists = ast.value.slice(1);
+
+  if (lists.length === 0) {
+    return new MalNil();
+  }
+
   for (const list of lists) {
     EVAL(list, env);
   }
@@ -72,7 +77,7 @@ const isList = (arg) => {
   return (arg instanceof MalList);
 };
 
-const ifn = (ast, env) => {
+const ifBlock = (ast, env) => {
   const [predicate, ifBlock, elsePart] = ast.value.slice(1);
 
   const evaluatedPredicate = EVAL(predicate, env)
@@ -104,6 +109,25 @@ const prn = (...args) => {
   return new MalNil();
 };
 
+const fnBlock = (ast, env) => {
+  const scopeEnv = new Env(env);
+
+  return (...args) => {
+    const bindings = ast.value[1].value;
+
+    for (let i = 0; i < bindings.length; i++) {
+      scopeEnv.set(bindings[i], EVAL(args[i], scopeEnv));
+    }
+
+    const exp = ast.value[2];
+    if (exp) {
+      return EVAL(exp, scopeEnv);
+    }
+
+    return new MalNil();
+  }
+};
+
 const EVAL = (ast, env) => {
   if (!(ast instanceof MalList)) {
     return eval_ast(ast, env);
@@ -115,7 +139,8 @@ const EVAL = (ast, env) => {
     case 'def!': return bindDef(ast, env);
     case 'let*': return bindLet(ast, env);
     case 'do': return doBlock(ast, env);
-    case 'if': return ifn(ast, env);
+    case 'if': return ifBlock(ast, env);
+    case 'fn*': return fnBlock(ast, env);
   }
 
   const [fn, ...args] = eval_ast(ast, env).value;
