@@ -26,6 +26,10 @@ class MalList extends MalValue {
   isEmpty() {
     return this.value.length === 0;
   }
+
+  count() {
+    return this.value.length;
+  }
 }
 
 class MalVector extends MalValue {

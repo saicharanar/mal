@@ -30,9 +30,9 @@ const read_atom = (reader) => {
     return new MalValue(parseInt(token));
   }
 
-  if (token === 'true') true
-  if (token === 'false') false
-  if (token === 'nil') new MalNil();
+  if (token === 'true') return true
+  if (token === 'false') return false
+  if (token === 'nil') return new MalNil();
 
   return new MalSymbol(token);
 };
