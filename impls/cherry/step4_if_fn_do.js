@@ -3,6 +3,7 @@ const { read_str } = require('./reader.js');
 const { pr_str } = require('./printer.js');
 const { MalSymbol, MalList, MalValue, MalVector, MalObject, MalNil } = require('./types.js');
 const { Env } = require('./env.js');
+const { isDeepStrictEqual } = require('util')
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -98,23 +99,9 @@ const count = (arg) => {
   return new MalValue(arg.count());
 };
 
-const greaterThan = (ast, env) => {
-  const [lhs, rhs] = ast.value.slice(1);
-  return EVAL(lhs, env) > EVAL(rhs, env);
-};
-
-const lessThan = (ast, env) => {
-  const [lhs, rhs] = ast.value.slice(1);
-  return EVAL(lhs, env) < EVAL(rhs, env);
-};
-
-const equals = (ast, env) => {
-  return;
-};
-
-const prn = (ast, env) => {
-  const arg = ast.value[1];
-  return EVAL(arg, env);
+const prn = (...args) => {
+  console.log(...args.map(item => pr_str(item)));
+  return new MalNil();
 };
 
 const EVAL = (ast, env) => {
@@ -129,13 +116,32 @@ const EVAL = (ast, env) => {
     case 'let*': return bindLet(ast, env);
     case 'do': return doBlock(ast, env);
     case 'if': return ifn(ast, env);
-    case 'prn': return prn(ast, env);
   }
 
   const [fn, ...args] = eval_ast(ast, env).value;
   return fn.apply(null, args);
 };
 
+const binOperator = (predicate) => (...args) => {
+  for (let i = 1; i < args.length; i++) {
+    console.log(args[i]);
+    const RHS = args[i - 1].value;
+    const LHS = args[i].value;
+
+    if (!predicate(RHS, LHS)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+
+const equals = (a, b) => isDeepStrictEqual(a, b);
+const lessThan = (a, b) => a < b;
+const greaterThan = (a, b) => a > b;
+const lessThanEqual = (a, b) => a <= b;
+const greaterThanEqual = (a, b) => a >= b;
 
 const READ = (str) => read_str(str);
 const PRINT = (malValue) => pr_str(malValue);
@@ -149,6 +155,13 @@ env.set(new MalSymbol('list'), createList);
 env.set(new MalSymbol('list?'), isList);
 env.set(new MalSymbol('empty?'), isEmpty);
 env.set(new MalSymbol('count'), count);
+env.set(new MalSymbol('prn'), prn);
+env.set(new MalSymbol('println'), prn);
+env.set(new MalSymbol('='), binOperator(equals));
+env.set(new MalSymbol('<'), binOperator(lessThan));
+env.set(new MalSymbol('<='), binOperator(lessThanEqual));
+env.set(new MalSymbol('>'), binOperator(greaterThan));
+env.set(new MalSymbol('>='), binOperator(greaterThanEqual));
 
 const rep = (str) => PRINT(EVAL(READ(str), env));
 
