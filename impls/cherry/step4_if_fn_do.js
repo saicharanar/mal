@@ -63,14 +63,12 @@ const doBlock = (ast, env) => {
   return (EVAL(...lists.slice(-1), env));
 };
 
-const createList = (ast, env) => {
-  const list = ast.value.slice(1);
-  return new MalList(list.map(listItem => EVAL(listItem, env)))
+const createList = (...args) => {
+  return new MalList(args);
 };
 
-const isList = (ast, env) => {
-  const list = ast.value[1];
-  return (list instanceof MalList);
+const isList = (arg) => {
+  return (arg instanceof MalList);
 };
 
 const ifn = (ast, env) => {
@@ -88,18 +86,16 @@ const ifn = (ast, env) => {
   return new MalNil();
 };
 
-const isEmpty = (ast, env) => {
-  const list = ast.value[1];
-  return EVAL(list, env).isEmpty();
+const isEmpty = (arg) => {
+  return arg.isEmpty();
 };
 
-const count = (ast, env) => {
-  const list = ast.value.slice(1)[0];
-  if (list instanceof MalNil) {
+const count = (arg) => {
+  if (arg instanceof MalNil) {
     return new MalValue(0);
   }
 
-  return new MalValue(EVAL(list, env).count());
+  return new MalValue(arg.count());
 };
 
 const greaterThan = (ast, env) => {
@@ -113,7 +109,7 @@ const lessThan = (ast, env) => {
 };
 
 const equals = (ast, env) => {
-  return true;
+  return;
 };
 
 const prn = (ast, env) => {
@@ -129,41 +125,11 @@ const EVAL = (ast, env) => {
   if (ast.isEmpty()) return ast;
 
   switch (ast.value[0].value) {
-    case 'def!':
-      return bindDef(ast, env);
-
-    case 'let*':
-      return bindLet(ast, env);
-
-    case 'do':
-      return doBlock(ast, env);
-
-    case 'list':
-      return createList(ast, env);
-
-    case 'list?':
-      return isList(ast, env);
-
-    case 'if':
-      return ifn(ast, env);
-
-    case 'empty?':
-      return isEmpty(ast, env);
-
-    case 'count':
-      return count(ast, env);
-
-    case '>':
-      return greaterThan(ast, env);
-
-    case '<':
-      return lessThan(ast, env);
-
-    case '=':
-      return equals(ast, env);
-
-    case 'prn':
-      return prn(ast, env);
+    case 'def!': return bindDef(ast, env);
+    case 'let*': return bindLet(ast, env);
+    case 'do': return doBlock(ast, env);
+    case 'if': return ifn(ast, env);
+    case 'prn': return prn(ast, env);
   }
 
   const [fn, ...args] = eval_ast(ast, env).value;
@@ -175,10 +141,14 @@ const READ = (str) => read_str(str);
 const PRINT = (malValue) => pr_str(malValue);
 
 const env = new Env();
-env.set(new MalSymbol('+'), (...args) => args.reduce(sum))
-env.set(new MalSymbol('-'), (...args) => args.reduce(sub))
-env.set(new MalSymbol('*'), (...args) => args.reduce(mul))
-env.set(new MalSymbol('/'), (...args) => args.reduce(div))
+env.set(new MalSymbol('+'), (...args) => args.reduce(sum));
+env.set(new MalSymbol('-'), (...args) => args.reduce(sub));
+env.set(new MalSymbol('*'), (...args) => args.reduce(mul));
+env.set(new MalSymbol('/'), (...args) => args.reduce(div));
+env.set(new MalSymbol('list'), createList);
+env.set(new MalSymbol('list?'), isList);
+env.set(new MalSymbol('empty?'), isEmpty);
+env.set(new MalSymbol('count'), count);
 
 const rep = (str) => PRINT(EVAL(READ(str), env));
 
