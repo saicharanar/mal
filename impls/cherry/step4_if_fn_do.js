@@ -85,7 +85,15 @@ const fnBlock = (ast, env) => {
     const bindings = ast.value[1].value;
 
     for (let i = 0; i < bindings.length; i++) {
-      scopeEnv.set(bindings[i], EVAL(args[i], scopeEnv));
+      if (bindings[i].value === '&') {
+        const name = bindings[i + 1];
+        const restOfArgs = args.slice(i);
+
+        scopeEnv.set(name, new MalList(restOfArgs));
+        i = bindings.length;
+      } else {
+        scopeEnv.set(bindings[i], EVAL(args[i], scopeEnv));
+      }
     }
 
     const exp = ast.value[2];
