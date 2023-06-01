@@ -28,6 +28,10 @@ const prn = (...args) => {
   return new MalNil();
 };
 
+const not = (arg) => {
+  return !(arg && !(arg instanceof MalNil));
+};
+
 const binOperator = (predicate) => (...args) => {
   for (let i = 1; i < args.length; i++) {
     console.log(args[i]);
@@ -53,7 +57,6 @@ const sub = (x, y) => new MalValue(x.value - y.value);
 const div = (x, y) => new MalValue(x.value / y.value);
 
 
-
 const env = new Env();
 env.set(new MalSymbol('+'), (...args) => args.reduce(sum));
 env.set(new MalSymbol('-'), (...args) => args.reduce(sub));
@@ -65,6 +68,8 @@ env.set(new MalSymbol('empty?'), isEmpty);
 env.set(new MalSymbol('count'), count);
 env.set(new MalSymbol('prn'), prn);
 env.set(new MalSymbol('println'), prn);
+env.set(new MalSymbol('pr_str'), pr_str);
+env.set(new MalSymbol('not'), not);
 env.set(new MalSymbol('='), binOperator(equals));
 env.set(new MalSymbol('<'), binOperator(lessThan));
 env.set(new MalSymbol('<='), binOperator(lessThanEqual));

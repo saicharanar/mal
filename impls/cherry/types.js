@@ -3,7 +3,7 @@ class MalValue {
     this.value = value;
   }
 
-  pr_str() { //pr_str
+  pr_str() {
     return this.value.toString();
   }
 };
@@ -70,4 +70,14 @@ class MalNil extends MalValue {
   }
 }
 
-module.exports = { MalSymbol, MalList, MalValue, MalVector, MalObject, MalNil };
+class MalString extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str() {
+    return '"' + this.value + '"';
+  }
+}
+
+module.exports = { MalSymbol, MalList, MalValue, MalVector, MalObject, MalNil, MalString };
