@@ -55,7 +55,6 @@ const not = (arg) => {
 
 const binOperator = (predicate) => (...args) => {
   for (let i = 1; i < args.length; i++) {
-    console.log(args[i]);
     const RHS = args[i - 1].value;
     const LHS = args[i].value;
 
