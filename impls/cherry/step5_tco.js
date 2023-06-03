@@ -1,7 +1,15 @@
 const readline = require('readline');
 const { read_str } = require('./reader.js');
 const { pr_str } = require('./printer.js');
-const { MalSymbol, MalList, MalValue, MalVector, MalObject, MalNil, MalFunction } = require('./types.js');
+const {
+  MalSymbol,
+  MalList,
+  MalValue,
+  MalVector,
+  MalObject,
+  MalNil,
+  MalFunction
+} = require('./types.js');
 const { env } = require('./core.js');
 const { Env } = require('./env.js');
 

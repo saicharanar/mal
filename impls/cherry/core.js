@@ -30,7 +30,7 @@ const prn = (...args) => {
 
 const println = (...args) => {
   const argsList = val_list(args);
-
+  
   console.log(...argsList);
   return new MalNil();
 };
