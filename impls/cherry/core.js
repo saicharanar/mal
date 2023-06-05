@@ -61,7 +61,7 @@ const binOperator = (predicate) => (...args) => {
 };
 
 const read_str_fn = (str) => {
-  return read_str(str.value);
+  return read_str(pr_str(str.value, false));
 };
 
 const equals = (a, b) => isDeepStrictEqual(a, b);
@@ -106,34 +106,6 @@ const ns = {
   'reset!': (atom, value) => atom.reset(value),
   'swap!': (atom, f, ...args) => atom.swap(f, args),
 };
-
-// env.set(new MalSymbol('+'), (...args) => args.reduce(sum));
-// env.set(new MalSymbol('-'), (...args) => args.reduce(sub));
-// env.set(new MalSymbol('*'), (...args) => args.reduce(mul));
-// env.set(new MalSymbol('/'), (...args) => args.reduce(div));
-// env.set(new MalSymbol('list'), createList);
-// env.set(new MalSymbol('list?'), isList);
-// env.set(new MalSymbol('empty?'), isEmpty);
-// env.set(new MalSymbol('count'), count);
-// env.set(new MalSymbol('str'), str);
-// env.set(new MalSymbol('prn'), prn);
-// env.set(new MalSymbol('println'), println);
-// env.set(new MalSymbol('pr-str'), pr_str_fn);
-// env.set(new MalSymbol('not'), not);
-// env.set(new MalSymbol('='), binOperator(equals));
-// env.set(new MalSymbol('<'), binOperator(lessThan));
-// env.set(new MalSymbol('<='), binOperator(lessThanEqual));
-// env.set(new MalSymbol('>'), binOperator(greaterThan));
-// env.set(new MalSymbol('>='), binOperator(greaterThanEqual));
-// env.set(new MalSymbol('read-string'), read_str_fn);
-// env.set(new MalSymbol('slurp'), filename => {
-//   return createMalString(fs.readFileSync(filename.value, 'utf-8'));
-// });
-// env.set(new MalSymbol('atom'), value => new MalAtom(value));
-// env.set(new MalSymbol('atom?'), value => value instanceof MalAtom);
-// env.set(new MalSymbol('deref'), atom => atom.deref());
-// env.set(new MalSymbol('reset!'), (atom, value) => atom.reset(value));
-// env.set(new MalSymbol('swap!'), (atom, f, ...args) => atom.swap(f, args));
 
 const bindNS = () => {
   Object.entries(ns).forEach(([symbol, fn]) => {

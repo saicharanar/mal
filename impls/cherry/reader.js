@@ -20,7 +20,10 @@ class Reader {
 const tokenize = (str) => {
   const regex = /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
 
-  return [...str.matchAll(regex)].map(x => x[1]).slice(0, -1);
+  return [...str.matchAll(regex)]
+    .map(x => x[1])
+    .slice(0, -1)
+    .filter(token => !(token.startsWith(';')));
 };
 
 const read_atom = (reader) => {

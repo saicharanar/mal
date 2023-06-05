@@ -136,7 +136,7 @@ class MalString extends MalValue {
       );
     }
 
-    return '"' + this.value + '"';
+    return this.value;
   }
 }
 
