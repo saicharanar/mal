@@ -75,8 +75,13 @@ class MalString extends MalValue {
     super(value);
   }
 
-  pr_str() {
-    return '"' + this.value + '"';
+  pr_str(readable) {
+    if (readable) {
+      const quoteEscaped = this.value;
+      return '"' + quoteEscaped + '"';
+    }
+
+    return this.value;
   }
 }
 

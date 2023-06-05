@@ -24,29 +24,21 @@ const count = (arg) => {
 };
 
 const prn = (...args) => {
-  console.log(...args.map(item => pr_str(item)));
+  console.log(args.map(item => pr_str(item, true)).join(' '));
   return new MalNil();
 };
 
 const println = (...args) => {
-  const argsList = val_list(args);
-  
-  console.log(...argsList);
+  console.log(args.map(item => pr_str(item, false)).join(' '));
   return new MalNil();
 };
 
-const val_list = (args) => {
-  return args.map(item => {
-    if (item instanceof MalString) {
-      return item.value;
-    }
-
-    return pr_str(item);
-  })
+const str = (...args) => {
+  return new MalString(args.map((item) => pr_str(item, false)).join(''));
 };
 
-const str = (...args) => {
-  return new MalString(val_list(args).join(''));
+const pr_str_fn = (...args) => {
+  return new MalString(args.map((item) => pr_str(item, true)).join(' '));
 };
 
 const not = (arg) => {
@@ -77,7 +69,7 @@ const sub = (x, y) => new MalValue(x.value - y.value);
 const div = (x, y) => new MalValue(x.value / y.value);
 
 
-const env = new Env();
+const env = new Env(null, [], []);
 env.set(new MalSymbol('+'), (...args) => args.reduce(sum));
 env.set(new MalSymbol('-'), (...args) => args.reduce(sub));
 env.set(new MalSymbol('*'), (...args) => args.reduce(mul));
@@ -89,7 +81,7 @@ env.set(new MalSymbol('count'), count);
 env.set(new MalSymbol('str'), str);
 env.set(new MalSymbol('prn'), prn);
 env.set(new MalSymbol('println'), println);
-env.set(new MalSymbol('pr-str'), pr_str);
+env.set(new MalSymbol('pr-str'), pr_str_fn);
 env.set(new MalSymbol('not'), not);
 env.set(new MalSymbol('='), binOperator(equals));
 env.set(new MalSymbol('<'), binOperator(lessThan));
