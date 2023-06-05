@@ -1,3 +1,23 @@
+const createMalString = (str) => {
+
+  const value = str.replace(/\\(.)/g,
+    (_, captured) => captured === 'n' ? '\n' : captured);
+  return new MalString(value);
+}
+
+
+const pr_str = (malValue, readable = true) => {
+  if (malValue instanceof Function) {
+    return '#<function>'
+  }
+
+  if (malValue instanceof MalValue) {
+    return malValue.pr_str(readable);
+  }
+
+  return malValue.toString();
+};
+
 class MalValue {
   constructor(value) {
     this.value = value;
@@ -20,7 +40,7 @@ class MalList extends MalValue {
   }
 
   pr_str() {
-    return '(' + this.value.map(x => x.pr_str()).join(' ') + ')';
+    return '(' + this.value.map(x => pr_str(x)).join(' ') + ')';
   }
 
   isEmpty() {
@@ -38,7 +58,7 @@ class MalVector extends MalValue {
   }
 
   pr_str() {
-    return '[' + this.value.map(x => x.pr_str()).join(' ') + ']';
+    return '[' + this.value.map(x => pr_str(x)).join(' ') + ']';
   }
 
   isEmpty() {
@@ -70,6 +90,35 @@ class MalNil extends MalValue {
   }
 }
 
+class CommentException extends Error {
+  constructor(errorMsg) {
+    super(errorMsg);
+  }
+}
+class MalAtom extends MalValue {
+  constructor(value) {
+    super(value);
+  }
+
+  pr_str(print_readably = false) {
+    return "(atom " + pr_str(this.value, print_readably) + ")";
+  }
+
+  deref() {
+    return this.value;
+  }
+
+  reset(value) {
+    this.value = value
+    return this.value;
+  }
+
+  swap(f, args) {
+    this.value = f.apply(null, [this.value, ...args]);
+    return this.value;
+  }
+}
+
 class MalString extends MalValue {
   constructor(value) {
     super(value);
@@ -77,23 +126,34 @@ class MalString extends MalValue {
 
   pr_str(readable) {
     if (readable) {
-      const quoteEscaped = this.value;
-      return '"' + quoteEscaped + '"';
+      return (
+        '"' +
+        this.value
+          .replace(/\\/g, '\\\\')
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, '\\n') +
+        '"'
+      );
     }
 
-    return this.value;
+    return '"' + this.value + '"';
   }
 }
 
 class MalFunction extends MalValue {
-  constructor(ast, binds, env) {
+  constructor(ast, binds, env, fn) {
     super(ast);
     this.binds = binds;
     this.env = env;
+    this.fn = fn;
   }
 
   pr_str() {
     return '#<function>';
+  }
+
+  apply(ctx, args) {
+    return this.fn.apply(null, args);
   }
 }
 
@@ -105,5 +165,9 @@ module.exports = {
   MalObject,
   MalNil,
   MalString,
-  MalFunction
+  MalFunction,
+  MalAtom,
+  createMalString,
+  pr_str,
+  CommentException
 };

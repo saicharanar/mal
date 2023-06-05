@@ -1,4 +1,4 @@
-const { MalSymbol, MalList, MalValue, MalVector, MalObject, MalNil, MalString } = require('./types.js');
+const { MalSymbol, MalList, MalValue, MalVector, MalObject, MalNil, MalString, CommentException, createMalString } = require('./types.js');
 
 class Reader {
   constructor(tokens) {
@@ -26,10 +26,6 @@ const tokenize = (str) => {
 const read_atom = (reader) => {
   const token = reader.next();
 
-  if (token.startsWith('"')) {
-    return new MalString(token.slice(1, -1));
-  }
-
   if (token.match(/^-?[0-9]+$/)) {
     return new MalValue(parseInt(token));
   }
@@ -37,6 +33,10 @@ const read_atom = (reader) => {
   if (token === 'true') return true
   if (token === 'false') return false
   if (token === 'nil') return new MalNil();
+
+  if (token.startsWith('"')) {
+    return (createMalString(token.slice(1, -1)));
+  }
 
   return new MalSymbol(token);
 };
@@ -71,19 +71,29 @@ const read_object = (reader) => {
   return new MalObject(ast);
 };
 
+const prependSymbol = (reader, symbol) => {
+  reader.next();
+  return new MalList([new MalSymbol(symbol), read_form(reader)]);
+};
+
 const read_form = (reader) => {
   const token = reader.peek();
 
-  switch (token) {
+  switch (token[0]) {
     case '(':
       reader.next();
       return read_list(reader);
     case '[':
       reader.next();
       return read_vector(reader);
+    case ';':
+      reader.next();
+      return new MalNil();
     case '{':
       reader.next();
       return read_object(reader);
+    case '@':
+      return prependSymbol(reader, 'deref');
     default:
       return read_atom(reader);
   }

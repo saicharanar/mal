@@ -1,15 +1,15 @@
-const { MalValue } = require("./types");
+const { MalValue, pr_str } = require("./types");
 
-const pr_str = (malValue, readable = true) => {
-  if (malValue instanceof Function) {
-    return '#<function>'
-  }
+// const pr_str = (malValue, readable = true) => {
+//   if (malValue instanceof Function) {
+//     return '#<function>'
+//   }
 
-  if (malValue instanceof MalValue) {
-    return malValue.pr_str(readable);
-  }
+//   if (malValue instanceof MalValue) {
+//     return malValue.pr_str(readable);
+//   }
 
-  return malValue.toString();
-};
+//   return malValue.toString();
+// };
 
 module.exports = { pr_str };
