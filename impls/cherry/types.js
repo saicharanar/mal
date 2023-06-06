@@ -39,8 +39,8 @@ class MalList extends MalValue {
     super(value);
   }
 
-  pr_str() {
-    return '(' + this.value.map(x => pr_str(x)).join(' ') + ')';
+  pr_str(print_readably) {
+    return '(' + this.value.map(x => pr_str(x, print_readably)).join(' ') + ')';
   }
 
   isEmpty() {
@@ -49,6 +49,10 @@ class MalList extends MalValue {
 
   count() {
     return this.value.length;
+  }
+
+  beginsWith(symbol) {
+    return this.value.length > 0 && this.value[0].value === symbol;
   }
 }
 
@@ -152,7 +156,7 @@ class MalFunction extends MalValue {
     return '#<function>';
   }
 
-  apply(ctx, args) {
+  apply(_, args) {
     return this.fn.apply(null, args);
   }
 }

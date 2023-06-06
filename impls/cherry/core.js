@@ -105,6 +105,9 @@ const ns = {
   'deref': atom => atom.deref(),
   'reset!': (atom, value) => atom.reset(value),
   'swap!': (atom, f, ...args) => atom.swap(f, args),
+  'cons': (value, list) => new MalList([value, ...list.value]),
+  'concat': (...lists) => new MalList(lists.flatMap(x => x.value)),
+  'vec': (list) => new MalVector(list.value.slice()),
 };
 
 const bindNS = () => {
