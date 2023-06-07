@@ -40,7 +40,8 @@ class Env {
   get(symbol) {
     const env = this.find(symbol);
 
-    if (!env) throw `${symbol.value} not found`;
+    if (!env)
+      throw `${symbol.value} not found`;
     return env.data[symbol.value];
   }
 };
